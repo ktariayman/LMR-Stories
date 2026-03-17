@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Story } from '../types';
+import { StoryListItem } from '../types';
 import { Colors } from '../constants/colors';
 
 interface StoryCardProps {
-  story: Story;
+  story: StoryListItem;
   isCompleted: boolean;
   onPress: () => void;
 }
@@ -21,7 +21,7 @@ export default function StoryCard({ story, isCompleted, onPress }: StoryCardProp
         </View>
       )}
       <View style={styles.topRow}>
-        <Text style={styles.emoji}>{story.themeEmoji}</Text>
+        <Text style={styles.emoji}>{story.theme_emoji}</Text>
         <Text style={styles.title} numberOfLines={2}>
           {story.title}
         </Text>

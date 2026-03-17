@@ -9,14 +9,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
 import StoryCard from '../components/StoryCard';
 import { useAppStore } from '../store/useAppStore';
 import { Colors } from '../constants/colors';
-import { RootStackParamList, Language, StoryListItem } from '../types';
-
-type HomeNavProp = StackNavigationProp<RootStackParamList, 'Home'>;
+import { RootStackParamList, MainTabParamList, Language, StoryListItem } from '../types';
 
 const LANGUAGES: { code: Language; label: string }[] = [
   { code: 'en', label: 'EN 🇬🇧' },
@@ -25,7 +22,6 @@ const LANGUAGES: { code: Language; label: string }[] = [
 ];
 
 export default function HomeScreen() {
-  const navigation = useNavigation<HomeNavProp>();
   const {
     stories,
     completedStories,
@@ -45,7 +41,7 @@ export default function HomeScreen() {
 
   async function handleStoryPress(item: StoryListItem) {
     await loadStory(item.id);
-    navigation.navigate('Story', { storyId: item.id });
+    router.push(`/(tabs)/story/${item.id}`);
   }
 
   return (
@@ -108,16 +104,7 @@ export default function HomeScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <StoryCard
-              story={{
-                id: item.id,
-                title: item.title,
-                difficulty: item.difficulty,
-                age_group: item.age_group,
-                theme: item.theme,
-                themeEmoji: item.theme_emoji,
-                summary: item.summary,
-                language: item.language,
-              }}
+              story={item}
               isCompleted={completedStories.includes(item.id)}
               onPress={() => handleStoryPress(item)}
             />

@@ -119,16 +119,17 @@ export const useAppStore = create<AppState>((set, get) => ({
       const story: Story = {
         id: detail.id,
         slug: detail.slug,
-        title: detail.translation.title,
-        language: detail.translation.language,
+        title: detail.title,
+        language: detail.language,
         difficulty: detail.difficulty,
         age_group: detail.age_group,
         theme: detail.theme,
         themeEmoji: detail.theme_emoji,
-        content: detail.translation.content,
-        summary: detail.translation.summary,
+        content: detail.content,
+        summary: detail.summary,
         quiz: detail.quiz,
         is_ai_generated: detail.is_ai_generated,
+        audio_content: detail.audio_content,
       };
       set({ currentStory: story, isLoading: false });
     } catch (e: any) {
@@ -169,7 +170,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (!currentStory) return;
 
     const score = currentStory.quiz.reduce((acc, q, i) => {
-      return quizAnswers[i] === q.answer ? acc + 1 : acc;
+      const correct = q.correct_answer || q.answer;
+      return quizAnswers[i] === correct ? acc + 1 : acc;
     }, 0);
 
     const total = currentStory.quiz.length;

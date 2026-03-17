@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "LMR Stories",
-    "slug": "lmr-stories",
+    "slug": "lmr-stories-app",
+    "scheme": "lmr-stories",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,7 +13,8 @@
       "backgroundColor": "#FF8C00"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "scheme": "lmr-stories"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,11 +23,22 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "scheme": "lmr-stories",
+      "package": "com.ktayman.lmrstoriesapp"
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "98b7aeeb-14ef-48c5-850f-0e9a2e75129c"
+      }
     }
   }
 }

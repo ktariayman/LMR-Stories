@@ -14,7 +14,10 @@
       "Bash(cp -r temp_expo/node_modules .)",
       "Bash(npx expo:*)",
       "Bash(npm install:*)",
-      "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 8081 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; Write-Host ''Done''\")"
+      "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 8081 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; Write-Host ''Done''\")",
+      "Bash(rm -rf src/database.ts src/routes src/services src/data)",
+      "Bash(mkdir -p src/entities src/migrations src/config src/routes src/services src/data)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

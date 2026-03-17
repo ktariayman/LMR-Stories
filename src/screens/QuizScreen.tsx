@@ -7,16 +7,14 @@ import {
   StyleSheet,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { router } from 'expo-router';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import QuizOption from '../components/QuizOption';
 import ProgressBar from '../components/ProgressBar';
 import StarRating from '../components/StarRating';
 import { useAppStore } from '../store/useAppStore';
 import { Colors } from '../constants/colors';
 import { RootStackParamList } from '../types';
-
-type QuizNavProp = StackNavigationProp<RootStackParamList, 'Quiz'>;
 
 type OptionState = 'default' | 'selected' | 'correct' | 'wrong';
 
@@ -28,15 +26,14 @@ function getMessage(score: number, total: number): string {
 }
 
 export default function QuizScreen() {
-  const navigation = useNavigation<QuizNavProp>();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const {
     currentStory,
     quizScore,
     setQuizAnswer,
     submitQuiz,
     resetQuiz,
-    markStoryCompleted,
   } = useAppStore();
 
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -59,7 +56,8 @@ export default function QuizScreen() {
     if (!isAnswered) {
       return option === selectedAnswer ? 'selected' : 'default';
     }
-    if (option === currentQuestion.answer) return 'correct';
+    const correctAnswer = (currentQuestion as any).correct_answer || currentQuestion.answer;
+    if (option === correctAnswer) return 'correct';
     if (option === selectedAnswer) return 'wrong';
     return 'default';
   }
@@ -93,18 +91,17 @@ export default function QuizScreen() {
   }
 
   function handleBackToStories() {
-    if (currentStory) markStoryCompleted(currentStory.id);
-    navigation.navigate('Home');
+    router.push('/(tabs)/');
   }
 
   if (showResults) {
     return (
       <View style={[styles.container, styles.resultsContainer]}>
-        <SafeAreaView edges={['top', 'bottom']} style={styles.resultsSafe}>
+        <SafeAreaView edges={['top']} style={styles.resultsSafe}>
           <ScrollView
             contentContainerStyle={[
               styles.resultsContent,
-              { paddingBottom: insets.bottom + 24 },
+              { paddingBottom: tabBarHeight + 10 },
             ]}
             showsVerticalScrollIndicator={false}
           >
@@ -148,7 +145,7 @@ export default function QuizScreen() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
             activeOpacity={0.7}
           >
             <Text style={styles.backArrow}>←</Text>
@@ -162,7 +159,7 @@ export default function QuizScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.quizContent,
-          { paddingBottom: insets.bottom + 24 },
+          { paddingBottom: tabBarHeight + 20 },
         ]}
         showsVerticalScrollIndicator={false}
       >

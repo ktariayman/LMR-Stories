@@ -4,7 +4,8 @@ export interface QuizQuestion {
   id?: string;
   question: string;
   options: string[];
-  answer: string;
+  answer?: string;
+  correct_answer?: string;
 }
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
@@ -25,6 +26,7 @@ export interface Story {
   summary: string;
   quiz: QuizQuestion[];
   is_ai_generated?: boolean;
+  audio_content?: string | null;
 }
 
 // API response shape from server
@@ -39,6 +41,7 @@ export interface StoryListItem {
   title: string;
   summary: string;
   language: Language;
+  audio_content?: string | null;
 }
 
 export interface StoryDetail {
@@ -49,13 +52,13 @@ export interface StoryDetail {
   theme: Theme;
   theme_emoji: string;
   is_ai_generated: boolean;
-  translation: {
-    language: Language;
-    title: string;
-    content: string;
-    summary: string;
-  };
+  title: string;
+  content: string;
+  summary: string;
+  language: Language;
+  available_languages: Language[];
   quiz: QuizQuestion[];
+  audio_content?: string | null;
 }
 
 // === Progress & Achievements ===
@@ -112,8 +115,8 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   HomeTab: undefined;
-  GenerateTab: undefined;
-  ProfileTab: undefined;
+  Generate: undefined;
+  Profile: undefined;
 };
 
 export type QuizAnswers = Record<number, string>;

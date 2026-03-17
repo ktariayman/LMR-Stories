@@ -7,17 +7,16 @@ import {
   StyleSheet,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { router } from 'expo-router';
 import { useAppStore } from '../store/useAppStore';
+import AudioPlayer from '../components/AudioPlayer';
 import { Colors } from '../constants/colors';
 import { RootStackParamList } from '../types';
-
-type StoryNavProp = StackNavigationProp<RootStackParamList, 'Story'>;
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function StoryScreen() {
-  const navigation = useNavigation<StoryNavProp>();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
   const { currentStory, resetQuiz } = useAppStore();
 
   const story = currentStory;
@@ -35,7 +34,7 @@ export default function StoryScreen() {
 
   function handleStartQuiz() {
     resetQuiz();
-    navigation.navigate('Quiz', { storyId: story!.id });
+    router.push(`/(tabs)/quiz/${story!.id}`);
   }
 
   return (
@@ -44,7 +43,7 @@ export default function StoryScreen() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
             activeOpacity={0.7}
           >
             <Text style={styles.backArrow}>←</Text>
@@ -72,29 +71,31 @@ export default function StoryScreen() {
         style={styles.scroll}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: 100 + insets.bottom },
+          { paddingBottom: tabBarHeight + 20 },
         ]}
         showsVerticalScrollIndicator={false}
       >
+        <AudioPlayer text={story.content} audioBase64={story.audio_content} />
+
         <Text style={styles.storyText}>{story.content}</Text>
 
         <View style={styles.summaryBox}>
           <Text style={styles.summaryLabel}>💡 The lesson</Text>
           <Text style={styles.summaryText}>{story.summary}</Text>
         </View>
-      </ScrollView>
 
-      <View style={[styles.bottomBar, { paddingBottom: insets.bottom + 12 }]}>
-        <TouchableOpacity
-          style={styles.quizButton}
-          onPress={handleStartQuiz}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.quizButtonText} allowFontScaling={false}>
-            Start Quiz 🎯
-          </Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.actionContainer}>
+          <TouchableOpacity
+            style={styles.quizButton}
+            onPress={handleStartQuiz}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.quizButtonText} allowFontScaling={false}>
+              Start Quiz 🎯
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -199,21 +200,9 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontWeight: '500',
   },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: Colors.white,
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 8,
+  actionContainer: {
+    marginTop: 32,
+    marginBottom: 20,
   },
   quizButton: {
     backgroundColor: Colors.primary,
