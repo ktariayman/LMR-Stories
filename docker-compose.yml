@@ -43,11 +43,11 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    env_file:
+      - ./server/.env
     environment:
-      PORT: 3001
       DATABASE_URL: postgres://lmr:lmr_password@postgres:5432/lmr_stories
       REDIS_URL: redis://redis:6379
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
     volumes:
       - ./server/src:/app/src
     command: npm run dev
