@@ -1,15 +1,16 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { View, Text } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { appConfig } from '../../src/config/appConfig';
+import { Colors } from '../../src/constants/colors';
 
 function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center', height: 45 }}>
-      <Text style={{ 
-        fontSize: 28, 
+    <View style={{ alignItems: 'center', justifyContent: 'center', height: 40 }}>
+      <Text style={{
+        fontSize: 26,
         transform: [{ scale: focused ? 1.2 : 1 }],
-        opacity: focused ? 1 : 0.6 
+        opacity: focused ? 1 : 0.55,
       }}>
         {emoji}
       </Text>
@@ -18,34 +19,33 @@ function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
 }
 
 export default function TabLayout() {
-  const insets = useSafeAreaInsets();
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#FF8C00',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#F0E0D0',
-          borderTopWidth: 2,
-          height: 100,
-          paddingBottom: 30, // Extra space for home bar/notches
-          paddingTop: 12,
-          elevation: 20,
+          backgroundColor: Colors.white,
+          borderTopColor: Colors.border,
+          borderTopWidth: 1.5,
+          height: 82,
+          paddingBottom: 16,
+          paddingTop: 8,
+          elevation: 16,
           shadowColor: '#000',
-          shadowOffset: { width: 0, height: -6 },
-          shadowOpacity: 0.12,
-          shadowRadius: 10,
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.08,
+          shadowRadius: 12,
         },
         tabBarLabelStyle: {
-          fontSize: 13,
-          fontWeight: '900',
-          marginTop: 4,
+          fontSize: 12,
+          fontWeight: '800',
+          marginTop: 2,
         },
       }}
     >
+      {/* Always shown */}
       <Tabs.Screen
         name="index"
         options={{
@@ -54,14 +54,28 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => <TabIcon emoji="📚" focused={focused} />,
         }}
       />
+
+      {/* Community tab — config-gated */}
+      <Tabs.Screen
+        name="community"
+        options={appConfig.enableCommunity ? {
+          title: 'Community',
+          tabBarLabel: 'Community',
+          tabBarIcon: ({ focused }) => <TabIcon emoji="🌟" focused={focused} />,
+        } : { href: null }}
+      />
+
+      {/* AI Generate tab — config-gated */}
       <Tabs.Screen
         name="generate"
-        options={{
+        options={appConfig.enableAI ? {
           title: 'Create',
           tabBarLabel: 'Create',
           tabBarIcon: ({ focused }) => <TabIcon emoji="✨" focused={focused} />,
-        }}
+        } : { href: null }}
       />
+
+      {/* Always shown */}
       <Tabs.Screen
         name="profile"
         options={{
@@ -70,18 +84,11 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => <TabIcon emoji="👤" focused={focused} />,
         }}
       />
-      <Tabs.Screen
-        name="story/[id]"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="quiz/[id]"
-        options={{
-          href: null,
-        }}
-      />
+
+      {/* Hidden stack screens — tab bar stays visible */}
+      <Tabs.Screen name="story/[id]" options={{ href: null, tabBarStyle: { display: 'flex', backgroundColor: Colors.white, borderTopColor: Colors.border, borderTopWidth: 1.5, height: 82, paddingBottom: 16, paddingTop: 8, elevation: 16, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 12 } }} />
+      <Tabs.Screen name="quiz/[id]" options={{ href: null, tabBarStyle: { display: 'flex', backgroundColor: Colors.white, borderTopColor: Colors.border, borderTopWidth: 1.5, height: 82, paddingBottom: 16, paddingTop: 8, elevation: 16, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 12 } }} />
+      <Tabs.Screen name="community/write" options={{ href: null, tabBarStyle: { display: 'flex', backgroundColor: Colors.white, borderTopColor: Colors.border, borderTopWidth: 1.5, height: 82, paddingBottom: 16, paddingTop: 8, elevation: 16, shadowColor: '#000', shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 12 } }} />
     </Tabs>
   );
 }

@@ -6,31 +6,35 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAppStore } from '../store/useAppStore';
 import AudioPlayer from '../components/AudioPlayer';
 import { Colors } from '../constants/colors';
-import { RootStackParamList } from '../types';
+import { getTextStyle } from '../utils/rtl';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useTranslation } from '../i18n';
 
 export default function StoryScreen() {
-  const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const { currentStory, resetQuiz } = useAppStore();
+  const { t } = useTranslation();
 
   const story = currentStory;
 
   if (!story) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>Story not found.</Text>
+        <Text style={styles.errorText}>{t('story.notFound')}</Text>
       </SafeAreaView>
     );
   }
 
   const difficultyColor =
-    story.difficulty === 'easy' ? Colors.easyBadge : Colors.mediumBadge;
+    story.difficulty === 'easy' ? Colors.easyBadge :
+    story.difficulty === 'hard' ? '#EF4444' : Colors.mediumBadge;
+
+  const rtlStyle = getTextStyle(story.language);
 
   function handleStartQuiz() {
     resetQuiz();
@@ -55,15 +59,18 @@ export default function StoryScreen() {
         <View style={styles.metaRow}>
           <View style={[styles.badge, { backgroundColor: difficultyColor }]}>
             <Text style={styles.badgeText} allowFontScaling={false}>
-              {story.difficulty.toUpperCase()}
+              {t(`common.${story.difficulty}` as any).toUpperCase()}
             </Text>
           </View>
           <View style={[styles.badge, { backgroundColor: Colors.ageBadge }]}>
             <Text style={styles.badgeText} allowFontScaling={false}>
-              Age {story.age_group}
+              {t('story.age', { group: story.age_group })}
             </Text>
           </View>
           <Text style={styles.themeEmoji}>{story.themeEmoji}</Text>
+          {story.story_type === 'community' && story.author_username ? (
+            <Text style={styles.authorChip}>@{story.author_username}</Text>
+          ) : null}
         </View>
       </SafeAreaView>
 
@@ -75,13 +82,13 @@ export default function StoryScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <AudioPlayer text={story.content} audioBase64={story.audio_content} />
+        <AudioPlayer text={story.content} language={story.language} />
 
-        <Text style={styles.storyText}>{story.content}</Text>
+        <Text style={[styles.storyText, rtlStyle]}>{story.content}</Text>
 
         <View style={styles.summaryBox}>
-          <Text style={styles.summaryLabel}>💡 The lesson</Text>
-          <Text style={styles.summaryText}>{story.summary}</Text>
+          <Text style={styles.summaryLabel}>💡 {t('story.lesson')}</Text>
+          <Text style={[styles.summaryText, rtlStyle]}>{story.summary}</Text>
         </View>
 
         <View style={styles.actionContainer}>
@@ -91,7 +98,7 @@ export default function StoryScreen() {
             activeOpacity={0.85}
           >
             <Text style={styles.quizButtonText} allowFontScaling={false}>
-              Start Quiz 🎯
+              {t('story.startQuiz')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -150,6 +157,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 12,
     gap: 8,
+    flexWrap: 'wrap',
   },
   badge: {
     paddingHorizontal: 10,
@@ -166,6 +174,15 @@ const styles = StyleSheet.create({
     fontSize: 22,
     marginLeft: 4,
   },
+  authorChip: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.communityBadge,
+    backgroundColor: Colors.communityBadgeLight,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
   scroll: {
     flex: 1,
   },
@@ -175,7 +192,7 @@ const styles = StyleSheet.create({
   },
   storyText: {
     fontSize: 20,
-    lineHeight: 34,
+    lineHeight: 36,
     color: Colors.textPrimary,
     fontWeight: '400',
   },
@@ -206,13 +223,18 @@ const styles = StyleSheet.create({
   },
   quizButton: {
     backgroundColor: Colors.primary,
-    borderRadius: 16,
-    paddingVertical: 16,
+    borderRadius: 18,
+    paddingVertical: 18,
     alignItems: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 6,
   },
   quizButtonText: {
     color: Colors.white,
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '900',
   },
 });

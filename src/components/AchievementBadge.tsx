@@ -2,23 +2,34 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../constants/colors';
 import { Achievement } from '../types';
+import { useTranslation } from '../i18n';
 
 interface AchievementBadgeProps {
   achievement: Achievement;
 }
 
 export default function AchievementBadge({ achievement }: AchievementBadgeProps) {
-  const earned = achievement.earned;
+  const earned = achievement.unlocked;
+  const { t } = useTranslation();
+
+  const titleKey = `achievement.${achievement.slug}.title` as any;
+  const descKey = `achievement.${achievement.slug}.description` as any;
+  const translatedTitle = t(titleKey);
+  const translatedDesc = t(descKey);
+
+  // Use translated text if available, fall back to server values
+  const title = translatedTitle !== titleKey ? translatedTitle : achievement.title;
+  const description = translatedDesc !== descKey ? translatedDesc : achievement.description;
 
   return (
     <View style={[styles.badge, !earned && styles.badgeLocked]}>
       <Text style={styles.emoji}>{earned ? achievement.emoji : '🔒'}</Text>
       <View style={styles.info}>
         <Text style={[styles.title, !earned && styles.textLocked]}>
-          {achievement.title}
+          {title}
         </Text>
         <Text style={[styles.description, !earned && styles.textLocked]}>
-          {achievement.description}
+          {description}
         </Text>
       </View>
       {earned && <Text style={styles.checkmark}>✅</Text>}

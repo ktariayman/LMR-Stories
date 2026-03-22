@@ -12,6 +12,7 @@ export type Difficulty = 'easy' | 'medium' | 'hard';
 export type AgeGroup = '5-7' | '8-10';
 export type Language = 'en' | 'fr' | 'ar';
 export type Theme = 'friendship' | 'animals' | 'adventure' | 'kindness' | 'courage';
+export type StoryType = 'official' | 'community';
 
 export interface Story {
   id: string;
@@ -27,6 +28,11 @@ export interface Story {
   quiz: QuizQuestion[];
   is_ai_generated?: boolean;
   audio_content?: string | null;
+  story_type?: StoryType;
+  author_id?: string | null;
+  author_username?: string | null;
+  is_public?: boolean;
+  vote_count?: number;
 }
 
 // API response shape from server
@@ -38,6 +44,12 @@ export interface StoryListItem {
   theme: Theme;
   theme_emoji: string;
   is_ai_generated: boolean;
+  story_type: StoryType;
+  author_id?: string | null;
+  author_username?: string | null;
+  is_public?: boolean;
+  vote_count?: number;
+  user_has_voted?: boolean;
   title: string;
   summary: string;
   language: Language;
@@ -52,6 +64,11 @@ export interface StoryDetail {
   theme: Theme;
   theme_emoji: string;
   is_ai_generated: boolean;
+  story_type: StoryType;
+  author_id?: string | null;
+  author_username?: string | null;
+  is_public?: boolean;
+  vote_count?: number;
   title: string;
   content: string;
   summary: string;
@@ -59,6 +76,14 @@ export interface StoryDetail {
   available_languages: Language[];
   quiz: QuizQuestion[];
   audio_content?: string | null;
+}
+
+// === User & Auth ===
+
+export interface User {
+  id: string;
+  username: string;
+  displayName: string | null;
 }
 
 // === Progress & Achievements ===
@@ -80,8 +105,8 @@ export interface Achievement {
   emoji: string;
   requirement_type: 'stories_completed' | 'perfect_quizzes' | 'languages_used' | 'streak';
   requirement_value: number;
-  earned: boolean;
-  earned_at?: string;
+  unlocked: boolean;
+  earned_at?: string | null;
 }
 
 export interface ProgressStats {
@@ -89,16 +114,17 @@ export interface ProgressStats {
   perfect_quizzes: number;
   languages_used: number;
   total_stars: number;
-  current_streak: number;
+  achievements_earned: number;
 }
 
 // === AI Generation ===
 
 export interface GenerateStoryRequest {
-  theme: Theme;
+  theme: string;
   difficulty: Difficulty;
   age_group: AgeGroup;
   language: Language;
+  is_public?: boolean;
 }
 
 export interface GenerateStoryResponse {
@@ -115,8 +141,14 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   HomeTab: undefined;
+  Community: undefined;
   Generate: undefined;
   Profile: undefined;
+};
+
+export type AuthStackParamList = {
+  Login: undefined;
+  Register: undefined;
 };
 
 export type QuizAnswers = Record<number, string>;

@@ -1,125 +1,69 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Audio } from 'expo-av';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import * as Speech from 'expo-speech';
 import { Colors } from '../constants/colors';
-import { useAppStore } from '../store/useAppStore';
+import { useTranslation } from '../i18n';
 
 interface AudioPlayerProps {
   text: string;
-  audioBase64?: string | null;
+  language?: string;
 }
 
-export default function AudioPlayer({ text, audioBase64 }: AudioPlayerProps) {
-  const isPlaying = useAppStore((s) => s.isPlaying);
-  const setIsPlaying = useAppStore((s) => s.setIsPlaying);
-  const [loading, setLoading] = useState(false);
-  const soundRef = useRef<Audio.Sound | null>(null);
+const LANG_LOCALE: Record<string, string> = {
+  en: 'en-US',
+  fr: 'fr-FR',
+  ar: 'ar-SA',
+};
+
+export default function AudioPlayer({ text, language = 'en' }: AudioPlayerProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    return () => {
-      if (soundRef.current) {
-        soundRef.current.unloadAsync();
-      }
-      setIsPlaying(false);
-    };
+    return () => { Speech.stop(); };
   }, []);
 
   const handlePlay = useCallback(async () => {
     if (isPlaying) {
-      if (soundRef.current) {
-        await soundRef.current.pauseAsync();
-      }
+      await Speech.stop();
       setIsPlaying(false);
       return;
     }
-
-    if (soundRef.current) {
-      await soundRef.current.playAsync();
-      setIsPlaying(true);
-      return;
-    }
-
-    if (!audioBase64) {
-      // Fallback or handle missing audio
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: `data:audio/mp3;base64,${audioBase64}` },
-        { shouldPlay: true }
-      );
-      soundRef.current = sound;
-      
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          setIsPlaying(false);
-          sound.setPositionAsync(0);
-          sound.pauseAsync();
-        }
-      });
-
-      setIsPlaying(true);
-    } catch (error) {
-      console.error('Playback Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [isPlaying, audioBase64]);
+    setIsPlaying(true);
+    Speech.speak(text, {
+      language: LANG_LOCALE[language] ?? 'en-US',
+      rate: 0.85,
+      onDone: () => setIsPlaying(false),
+      onError: () => setIsPlaying(false),
+      onStopped: () => setIsPlaying(false),
+    });
+  }, [isPlaying, text, language]);
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={[styles.button, isPlaying && styles.buttonActive]}
         onPress={handlePlay}
-        disabled={loading}
         activeOpacity={0.7}
       >
-        {loading ? (
-          <ActivityIndicator color={Colors.primary} />
-        ) : (
-          <>
-            <Text style={styles.icon}>{isPlaying ? '⏸️' : '🔊'}</Text>
-            <Text style={[styles.label, isPlaying && styles.labelActive]}>
-              {isPlaying ? 'Stop Reading' : 'Read Aloud (Human Voice)'}
-            </Text>
-          </>
-        )}
+        <Text style={styles.icon}>{isPlaying ? '⏸️' : '🔊'}</Text>
+        <Text style={[styles.label, isPlaying && styles.labelActive]}>
+          {isPlaying ? t('story.stopReading') : t('story.readAloud')}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginVertical: 12,
-  },
+  container: { marginVertical: 12 },
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.white,
-    borderWidth: 2,
-    borderColor: Colors.primary,
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    gap: 10,
-    minHeight: 56,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.white, borderWidth: 2, borderColor: Colors.primary,
+    borderRadius: 16, paddingVertical: 14, paddingHorizontal: 24, gap: 10, minHeight: 56,
   },
-  buttonActive: {
-    backgroundColor: Colors.primary,
-  },
-  icon: {
-    fontSize: 22,
-  },
-  label: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: Colors.primary,
-  },
-  labelActive: {
-    color: Colors.white,
-  },
+  buttonActive: { backgroundColor: Colors.primary },
+  icon: { fontSize: 22 },
+  label: { fontSize: 17, fontWeight: '700', color: Colors.primary },
+  labelActive: { color: Colors.white },
 });

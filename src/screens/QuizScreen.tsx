@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import QuizOption from '../components/QuizOption';
@@ -14,19 +14,12 @@ import ProgressBar from '../components/ProgressBar';
 import StarRating from '../components/StarRating';
 import { useAppStore } from '../store/useAppStore';
 import { Colors } from '../constants/colors';
-import { RootStackParamList } from '../types';
+import { getTextStyle } from '../utils/rtl';
+import { useTranslation } from '../i18n';
 
 type OptionState = 'default' | 'selected' | 'correct' | 'wrong';
 
-function getMessage(score: number, total: number): string {
-  if (score === total) return 'Amazing! You got them all! 🌟';
-  if (score === total - 1) return 'Great job! 🙂';
-  if (score === 1) return 'Good try! Keep reading! 💪';
-  return "Let's read the story again! 📖";
-}
-
 export default function QuizScreen() {
-  const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const {
     currentStory,
@@ -35,21 +28,57 @@ export default function QuizScreen() {
     submitQuiz,
     resetQuiz,
   } = useAppStore();
+  const { t } = useTranslation();
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
+  function getMessage(score: number, total: number): string {
+    if (score === total) return t('quiz.perfect');
+    if (score === total - 1) return t('quiz.great');
+    if (score === 1) return t('quiz.good');
+    return t('quiz.keepTrying');
+  }
+
   if (!currentStory) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>No story selected.</Text>
+        <Text style={styles.errorText}>{t('quiz.noStory')}</Text>
       </SafeAreaView>
     );
   }
 
-  const quiz = currentStory.quiz;
+  const quiz = currentStory.quiz ?? [];
+  const rtlStyle = getTextStyle(currentStory.language);
+
+  // No questions available for this story
+  if (quiz.length === 0) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()} activeOpacity={0.7}>
+            <Text style={styles.backArrow}>←</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle} numberOfLines={1}>{currentStory.title}</Text>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 }}>
+          <Text style={{ fontSize: 48, marginBottom: 16 }}>📖</Text>
+          <Text style={{ fontSize: 18, fontWeight: '700', color: '#374151', textAlign: 'center' }}>
+            {t('quiz.noQuestions')}
+          </Text>
+          <TouchableOpacity
+            style={[styles.primaryButton, { marginTop: 32, width: 'auto', paddingHorizontal: 32 }]}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.primaryButtonText}>{t('common.back')}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const currentQuestion = quiz[questionIndex];
 
   function deriveOptionState(option: string): OptionState {
@@ -105,10 +134,10 @@ export default function QuizScreen() {
             ]}
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.resultsTitle}>Quiz Complete! 🎉</Text>
+            <Text style={styles.resultsTitle}>{t('quiz.complete')}</Text>
             <StarRating score={quizScore} total={quiz.length} />
             <Text style={styles.scoreText}>
-              {quizScore} out of {quiz.length}
+              {t('quiz.score', { score: quizScore, total: quiz.length })}
             </Text>
             <Text style={styles.messageText}>
               {getMessage(quizScore, quiz.length)}
@@ -120,7 +149,7 @@ export default function QuizScreen() {
               activeOpacity={0.85}
             >
               <Text style={styles.primaryButtonText} allowFontScaling={false}>
-                Try Again 🔄
+                {t('quiz.tryAgain')}
               </Text>
             </TouchableOpacity>
 
@@ -130,7 +159,7 @@ export default function QuizScreen() {
               activeOpacity={0.85}
             >
               <Text style={styles.outlineButtonText} allowFontScaling={false}>
-                Back to Stories 📚
+                {t('quiz.backToStories')}
               </Text>
             </TouchableOpacity>
           </ScrollView>
@@ -165,7 +194,9 @@ export default function QuizScreen() {
       >
         <ProgressBar current={questionIndex + 1} total={quiz.length} />
 
-        <Text style={styles.questionText}>{currentQuestion.question}</Text>
+        <Text style={[styles.questionText, rtlStyle]}>
+          {currentQuestion.question}
+        </Text>
 
         <View style={styles.optionsContainer}>
           {currentQuestion.options.map((option) => (
@@ -232,10 +263,10 @@ const styles = StyleSheet.create({
     paddingTop: 24,
   },
   questionText: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: 22,
+    fontWeight: '800',
     color: Colors.textPrimary,
-    lineHeight: 34,
+    lineHeight: 32,
     marginBottom: 28,
     textAlign: 'center',
   },
@@ -255,8 +286,8 @@ const styles = StyleSheet.create({
     paddingTop: 48,
   },
   resultsTitle: {
-    fontSize: 30,
-    fontWeight: '800',
+    fontSize: 32,
+    fontWeight: '900',
     color: Colors.textPrimary,
     textAlign: 'center',
     marginBottom: 8,
@@ -278,21 +309,26 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: Colors.primary,
-    borderRadius: 16,
-    paddingVertical: 16,
+    borderRadius: 18,
+    paddingVertical: 18,
     paddingHorizontal: 32,
     alignItems: 'center',
     width: '100%',
     marginBottom: 12,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 6,
   },
   primaryButtonText: {
     color: Colors.white,
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '900',
   },
   outlineButton: {
     backgroundColor: 'transparent',
-    borderRadius: 16,
+    borderRadius: 18,
     paddingVertical: 16,
     paddingHorizontal: 32,
     alignItems: 'center',

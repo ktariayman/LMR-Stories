@@ -2,102 +2,80 @@
 
 ## Overview
 
-LMR Stories is a React Native (Expo) educational app for children aged 5-10. Kids read short stories and answer quizzes to test comprehension. Built with TypeScript, React Navigation, and Zustand.
+LMR Stories is a React Native (Expo) educational app for children aged 5-10. Kids read multilingual stories and take quizzes. Backed by an Express.js API with PostgreSQL, Redis caching, and Gemini AI for content generation.
 
 ---
 
-## Phase 1 - MVP (Current)
+## Architecture
 
-**Goal:** A working app we can hand to children for testing.
+```
+Mobile App (React Native / Expo)
+  └── API Client ──> Express.js Server
+                        ├── PostgreSQL (stories, quizzes, progress, achievements)
+                        ├── Redis (response caching)
+                        └── Google Gemini (AI story generation + translation)
+```
 
-### Done
-
-| Feature | Details |
-|---------|---------|
-| **Project Setup** | Expo SDK 55, TypeScript, React Navigation (Stack), Zustand |
-| **Home Screen** | Story list with FlatList, story cards showing title/difficulty/age/theme, completed story checkmarks |
-| **Story Screen** | Full story text display, large readable font (20px, 34px line height), scrollable content, metadata badges (difficulty, age, theme), summary box, "Start Quiz" button |
-| **Quiz Screen** | Question-by-question flow, progress bar with animation, 4-state answer buttons (default/selected/correct/wrong), auto-advance after 1.2s delay, results screen with star rating (1-3 stars), score display, contextual messages, "Try Again" and "Back to Stories" buttons |
-| **Zustand Store** | Current story tracking, quiz answer storage, score calculation, completed stories list |
-| **Story Data** | 10 stories in local JSON, 3 quiz questions each (30 total), 2 age groups (5-7, 8-10), 2 difficulty levels (easy, medium), 5 themes (friendship, animals, adventure, kindness, courage) |
-| **Reusable Components** | StoryCard, QuizOption, ProgressBar, StarRating |
-| **Design System** | Color palette (orange primary, cream background), typography scale (12px-32px), kid-friendly large buttons and text |
-| **Navigation** | 3-screen stack: Home -> Story -> Quiz, gesture-enabled back navigation, no header bars (custom UI) |
-| **Type Safety** | Full TypeScript types for Story, QuizQuestion, RootStackParamList, QuizAnswers |
-
-### Not Done (Phase 1 remaining)
-
-| Feature | Priority | Notes |
-|---------|----------|-------|
-| **Language filter (FR/AR)** | High | UI buttons exist but only English stories are available. Need French and Arabic story translations |
-| **Persistent progress** | High | Completed stories reset on app restart. Need AsyncStorage or MMKV persistence |
-| **Web platform fix** | Medium | Metro bundler returns 500 on web. Mobile (Expo Go) should work. Needs debugging |
-| **Error boundaries** | Medium | No error handling if story data is malformed or missing |
-| **Loading states** | Low | No skeleton/loading UI while stories load |
+All services run via Docker Compose.
 
 ---
 
-## Phase 2 - Multilingual Content
+## What's Done
 
-| Feature | Details |
-|---------|---------|
-| French stories | Translate all 10 stories + quizzes to French |
-| Arabic stories | Translate all 10 stories + quizzes to Arabic (RTL support needed) |
-| Language switcher | Filter stories by language on Home Screen (buttons already in UI) |
-| RTL layout | Mirror layout for Arabic content |
-| More stories | Expand to 30+ stories per language |
+### Phase 1 - MVP Core (COMPLETE)
 
----
+| Feature | Status |
+|---------|--------|
+| Expo SDK 55 + TypeScript + React Navigation | Done |
+| Home Screen (story list, filters, language tabs) | Done |
+| Story Screen (full text, large font, audio player) | Done |
+| Quiz Screen (question flow, progress bar, results + stars) | Done |
+| Zustand store with AsyncStorage persistence | Done |
+| 10 sample stories with quizzes | Done |
+| Reusable components (StoryCard, QuizOption, ProgressBar, StarRating) | Done |
+| Kid-friendly UI (large text, big buttons, warm colors) | Done |
 
-## Phase 3 - Audio & Engagement
+### Phase 2 - Multilingual Content (COMPLETE)
 
-| Feature | Details |
-|---------|---------|
-| Audio narration | Text-to-speech or pre-recorded audio for each story |
-| Read-along mode | Highlight words as audio plays |
-| Achievements/badges | Reward system for completing stories and quizzes |
-| Progress dashboard | Visual progress tracker for parents |
-| Animations | Page transitions, quiz feedback animations |
+| Feature | Status |
+|---------|--------|
+| 10 stories translated to French | Done |
+| 10 stories translated to Arabic | Done |
+| 3 quiz questions per story per language (90 total) | Done |
+| Language switcher (EN/FR/AR tabs on Home Screen) | Done |
+| API serves stories by language | Done |
 
----
+### Phase 3 - Audio & Engagement (COMPLETE)
 
-## Phase 4 - AI-Powered Content
+| Feature | Status |
+|---------|--------|
+| Text-to-speech via expo-speech | Done |
+| AudioPlayer component (play/pause/stop) | Done |
+| Achievement system (7 achievements) | Done |
+| Progress tracking (API-persisted) | Done |
+| Profile Screen (stats + achievements dashboard) | Done |
+| Star rating per quiz (1-3 stars) | Done |
 
-| Feature | Details |
-|---------|---------|
-| AI story generation | Use Claude/OpenAI API to generate new stories on demand |
-| Auto-translation | AI-powered translation pipeline for new languages |
-| Auto-quiz generation | Generate quiz questions from any story |
-| Interactive stories | "Choose your adventure" branching narratives |
-| Personalized difficulty | Adapt story complexity based on quiz performance |
+### Phase 4 - AI-Powered Content (COMPLETE)
 
----
+| Feature | Status |
+|---------|--------|
+| AI story generation via Gemini API | Done |
+| Generate Screen (choose theme/difficulty/age/language) | Done |
+| AI translation endpoint (translate any story to new language) | Done |
+| Generated stories saved to database | Done |
 
-## Phase 5 - Backend & Scale
+### Phase 5 - Backend & Infrastructure (COMPLETE)
 
-| Feature | Details |
-|---------|---------|
-| Backend API | Node.js/Express server for story management |
-| Database | PostgreSQL for stories, users, progress |
-| User accounts | Parent/child accounts with authentication |
-| Admin panel | Story management, content moderation |
-| Content pipeline | AI generates -> human reviews -> publishes |
-| Premium tier | Unlimited stories, audio, more languages |
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | React Native (Expo SDK 55) |
-| Language | TypeScript |
-| Navigation | React Navigation (Stack) |
-| State | Zustand |
-| Data | Local JSON (Phase 1), PostgreSQL (Phase 5) |
-| AI | Claude/OpenAI API (Phase 4) |
-| Audio | ElevenLabs / Google TTS (Phase 3) |
-| Translation | DeepL / Google Translate (Phase 2) |
+| Feature | Status |
+|---------|--------|
+| Express.js API server | Done |
+| PostgreSQL database with TypeORM entities | Done |
+| TypeORM migrations (not `synchronize`) | Done |
+| Redis caching (graceful degradation if unavailable) | Done |
+| Docker Compose (postgres + redis + server) | Done |
+| Seed script (10 stories × 3 languages) | Done |
+| REST API with full CRUD | Done |
 
 ---
 
@@ -105,53 +83,98 @@ LMR Stories is a React Native (Expo) educational app for children aged 5-10. Kid
 
 ```
 /
-├── App.tsx                     # Root component + navigation
-├── index.ts                    # Entry point
-├── app.json                    # Expo config
-├── package.json                # Dependencies
-├── tsconfig.json               # TypeScript config
-├── metro.config.js             # Metro bundler config
-├── babel.config.js             # Babel config
+├── App.tsx                        # Root: bottom tabs + stack navigation
+├── docker-compose.yml             # PostgreSQL + Redis + Server
 ├── src/
+│   ├── api/
+│   │   ├── client.ts              # Axios/fetch base client
+│   │   ├── stories.ts             # Story API calls
+│   │   ├── progress.ts            # Progress + achievements API
+│   │   └── generate.ts            # AI generation API
 │   ├── components/
-│   │   ├── StoryCard.tsx       # Story list card
-│   │   ├── QuizOption.tsx      # Quiz answer button
-│   │   ├── ProgressBar.tsx     # Animated quiz progress
-│   │   └── StarRating.tsx      # Star rating display
+│   │   ├── StoryCard.tsx
+│   │   ├── QuizOption.tsx
+│   │   ├── ProgressBar.tsx
+│   │   ├── StarRating.tsx
+│   │   ├── AudioPlayer.tsx        # TTS play/pause/stop
+│   │   └── AchievementBadge.tsx
 │   ├── screens/
-│   │   ├── HomeScreen.tsx      # Story listing
-│   │   ├── StoryScreen.tsx     # Story reader
-│   │   └── QuizScreen.tsx      # Quiz + results
-│   ├── store/
-│   │   └── useAppStore.ts      # Zustand store
-│   ├── stories/
-│   │   └── stories.json        # 10 sample stories
-│   ├── constants/
-│   │   ├── colors.ts           # Color palette
-│   │   └── fonts.ts            # Typography scale
-│   └── types/
-│       └── index.ts            # TypeScript interfaces
+│   │   ├── HomeScreen.tsx         # Story list + language/filter tabs
+│   │   ├── StoryScreen.tsx        # Reader + audio
+│   │   ├── QuizScreen.tsx         # Quiz + results
+│   │   ├── ProfileScreen.tsx      # Stats + achievements
+│   │   └── GenerateScreen.tsx     # AI story creation
+│   ├── store/useAppStore.ts       # Zustand + AsyncStorage
+│   ├── types/index.ts
+│   └── constants/
+│       ├── colors.ts
+│       └── fonts.ts
+├── server/
+│   ├── Dockerfile
+│   ├── src/
+│   │   ├── server.ts
+│   │   ├── entities/              # 6 TypeORM entities
+│   │   ├── migrations/            # SQL migrations
+│   │   ├── routes/                # stories, quizzes, progress, achievements, generate
+│   │   ├── services/ai.ts         # Gemini integration
+│   │   ├── config/
+│   │   │   ├── data-source.ts     # TypeORM config
+│   │   │   └── redis.ts           # Redis client + cache helpers
+│   │   └── data/seed.ts           # 10 stories × 3 languages
+│   └── package.json
 └── docs/
-    └── PROJECT_STATUS.md       # This file
+    ├── PROJECT_STATUS.md           # This file
+    └── WORKFLOW.md                 # Team workflow guide
 ```
 
 ---
 
-## Story Inventory (10 stories)
+## Story Inventory (10 stories × 3 languages)
 
-| # | Title | Difficulty | Age | Theme | Quiz Qs |
-|---|-------|-----------|-----|-------|---------|
-| 1 | The Kind Rabbit | Easy | 5-7 | Kindness | 3 |
-| 2 | Leo the Brave Lion | Easy | 5-7 | Courage | 3 |
-| 3 | The Friendship Bridge | Easy | 5-7 | Friendship | 3 |
-| 4 | Mia and the Magic Seeds | Medium | 5-7 | Kindness | 3 |
-| 5 | The Lost Star | Medium | 8-10 | Adventure | 3 |
-| 6 | Captain Coral and the Deep | Medium | 8-10 | Adventure | 3 |
-| 7 | The Elephant Who Never Forgot | Easy | 5-7 | Animals | 3 |
-| 8 | Two Wolves and One Moon | Medium | 8-10 | Animals | 3 |
-| 9 | The Boy Who Planted a Forest | Medium | 8-10 | Courage | 3 |
-| 10 | Nadia Makes a Friend | Easy | 5-7 | Friendship | 3 |
+| # | Title | Diff | Age | Theme | Languages |
+|---|-------|------|-----|-------|-----------|
+| 1 | The Kind Rabbit | Easy | 5-7 | Kindness | EN/FR/AR |
+| 2 | Leo the Brave Lion | Easy | 5-7 | Courage | EN/FR/AR |
+| 3 | The Friendship Bridge | Easy | 5-7 | Friendship | EN/FR/AR |
+| 4 | Mia and the Magic Seeds | Medium | 5-7 | Kindness | EN/FR/AR |
+| 5 | The Lost Star | Medium | 8-10 | Adventure | EN/FR/AR |
+| 6 | Captain Coral and the Deep | Medium | 8-10 | Adventure | EN/FR/AR |
+| 7 | The Elephant Who Never Forgot | Easy | 5-7 | Animals | EN/FR/AR |
+| 8 | Two Wolves and One Moon | Medium | 8-10 | Animals | EN/FR/AR |
+| 9 | The Boy Who Planted a Forest | Medium | 8-10 | Courage | EN/FR/AR |
+| 10 | Nadia Makes a Friend | Easy | 5-7 | Friendship | EN/FR/AR |
 
-**By difficulty:** Easy (6), Medium (4)
-**By age:** 5-7 (6), 8-10 (4)
-**By theme:** Kindness (2), Courage (2), Friendship (2), Adventure (2), Animals (2)
+**Total:** 10 stories × 3 languages = 30 story versions, 90 quiz questions
+
+---
+
+## Achievement System
+
+| Badge | Requirement |
+|-------|-------------|
+| First Story (📖) | Read 1 story |
+| Bookworm (🐛) | Read 5 stories |
+| Story Master (👑) | Read 10 stories |
+| Perfect Score (💯) | 1 perfect quiz |
+| Quiz Champion (🏆) | 5 perfect quizzes |
+| Bilingual Reader (🌍) | Read in 2 languages |
+| Polyglot (🗺️) | Read in 3 languages |
+
+---
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/stories` | List stories (query: language, difficulty, age_group, theme) |
+| GET | `/api/stories/:id` | Get story + quiz (query: language) |
+| POST | `/api/stories` | Create story (admin) |
+| DELETE | `/api/stories/:id` | Delete story |
+| GET | `/api/stories/:id/quiz` | Get quiz questions |
+| POST | `/api/stories/:id/quiz/submit` | Submit answers, get score |
+| GET | `/api/progress` | User's reading history |
+| GET | `/api/progress/stats` | Aggregated stats |
+| GET | `/api/achievements` | All achievements + unlock status |
+| POST | `/api/generate/story` | AI-generate a new story |
+| POST | `/api/generate/translate` | AI-translate existing story |
+| GET | `/api/health` | Health check |

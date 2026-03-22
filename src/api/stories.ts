@@ -1,11 +1,6 @@
 import { api } from './client';
 import {
-  StoryListItem,
-  StoryDetail,
-  Language,
-  Difficulty,
-  AgeGroup,
-  Theme,
+  StoryListItem, StoryDetail, Language, Difficulty, AgeGroup, Theme, StoryType,
 } from '../types';
 
 interface StoryFilters {
@@ -13,6 +8,7 @@ interface StoryFilters {
   difficulty?: Difficulty;
   age_group?: AgeGroup;
   theme?: Theme;
+  story_type?: StoryType;
 }
 
 export async function fetchStories(filters: StoryFilters = {}): Promise<StoryListItem[]> {
@@ -21,6 +17,7 @@ export async function fetchStories(filters: StoryFilters = {}): Promise<StoryLis
   if (filters.difficulty) params.set('difficulty', filters.difficulty);
   if (filters.age_group) params.set('age_group', filters.age_group);
   if (filters.theme) params.set('theme', filters.theme);
+  if (filters.story_type) params.set('story_type', filters.story_type);
 
   const query = params.toString();
   return api.get<StoryListItem[]>(`/api/stories${query ? `?${query}` : ''}`);

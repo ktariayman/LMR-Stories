@@ -31,4 +31,32 @@ export const Colors = {
   shadow: '#00000015',
   white: '#FFFFFF',
   black: '#000000',
+
+  // Children's vibrant palette
+  coral: '#FF6B6B',
+  mint: '#4ECDC4',
+  lavender: '#A78BFA',
+  sunflower: '#FBBF24',
+  sky: '#38BDF8',
+  bubblegum: '#F472B6',
+  lime: '#84CC16',
+  peach: '#FB923C',
+
+  // Theme card backgrounds (cycling)
+  cardTints: ['#FFF3E0', '#E8F5E9', '#E3F2FD', '#F3E5F5', '#E0F7FA', '#FFF9C4', '#FCE4EC'],
+
+  // Community
+  communityBadge: '#7C3AED',
+  communityBadgeLight: '#EDE9FE',
+  votedColor: '#EF4444',
+  voteDefault: '#9CA3AF',
+};
+
+// Theme → card tint color mapping
+export const THEME_COLORS: Record<string, string> = {
+  kindness: '#FFF3E0',
+  courage: '#FFE4E4',
+  friendship: '#E8F5E9',
+  adventure: '#E3F2FD',
+  animals: '#E0F7FA',
 };
