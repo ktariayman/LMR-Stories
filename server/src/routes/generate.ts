@@ -6,14 +6,14 @@ import { QuizQuestion } from '../entities/QuizQuestion';
 import { generateStory, translateStory } from '../services/ai';
 import { synthesizeSpeech } from '../services/tts';
 import { cacheDel } from '../config/redis';
-import { optionalAuth, requireAuth } from '../middleware/auth';
+import { requireAuth } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { generateStorySchema, translateSchema } from '../middleware/schemas';
 
 const router = Router();
 
 // POST /api/generate/story
-router.post('/story', optionalAuth, validate(generateStorySchema), async (req, res) => {
+router.post('/story', requireAuth, validate(generateStorySchema), async (req, res) => {
   try {
     const { theme = 'adventure', difficulty = 'easy', age_group = '5-7', language = 'en', is_public = false } = req.body;
 
@@ -23,7 +23,7 @@ router.post('/story', optionalAuth, validate(generateStorySchema), async (req, r
 
     const generated = await generateStory({ theme, difficulty, age_group, language });
 
-    const authorId = req.user?.userId ?? null;
+    const authorId = req.user!.userId;
 
     // Save to database
     const storyRepo = AppDataSource.getRepository(Story);
@@ -34,9 +34,9 @@ router.post('/story', optionalAuth, validate(generateStorySchema), async (req, r
       theme,
       themeEmoji: generated.theme_emoji || '✨',
       isAiGenerated: true,
-      storyType: authorId ? 'community' : 'official',
+      storyType: 'community',
       authorId,
-      isPublic: authorId ? Boolean(is_public) : true,
+      isPublic: Boolean(is_public),
     });
     const savedStory = await storyRepo.save(story);
 

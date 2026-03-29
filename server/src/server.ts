@@ -23,11 +23,22 @@ const PORT = process.env.PORT || 3001;
 // Security headers
 app.use(helmet());
 
-// CORS — restrict origins in production
+// CORS — restrict origins in production, allow all in development
+const isProduction = process.env.NODE_ENV === 'production';
 const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
-  : undefined; // undefined = allow all (dev only)
-app.use(cors(allowedOrigins ? { origin: allowedOrigins } : undefined));
+  : undefined;
+
+if (isProduction && !allowedOrigins) {
+  console.warn('WARNING: CORS_ORIGINS is not set in production. All cross-origin requests will be blocked.');
+}
+
+app.use(cors({
+  origin: isProduction
+    ? allowedOrigins ?? false   // block all if no origins configured in production
+    : allowedOrigins ?? true,   // allow all in development
+  credentials: true,
+}));
 
 app.use(express.json({ limit: '5mb' }));
 
@@ -78,10 +89,12 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Error handler
+// Error handler — hide internal details in production
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Server error:', err.message);
-  res.status(500).json({ error: err.message });
+  res.status(500).json({
+    error: isProduction ? 'Internal server error' : err.message,
+  });
 });
 
 async function bootstrap() {
