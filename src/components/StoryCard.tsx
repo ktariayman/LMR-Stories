@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { StoryListItem } from '../types';
 import { Colors, THEME_COLORS } from '../constants/colors';
 import { useTranslation } from '../i18n';
@@ -24,9 +24,11 @@ const DIFF_KEYS: Record<string, string> = {
 
 export default function StoryCard({ story, isCompleted, onPress }: StoryCardProps) {
   const { t } = useTranslation();
+  const [imgError, setImgError] = useState(false);
   const difficultyColor = DIFF_COLORS[story.difficulty] ?? Colors.mediumBadge;
   const cardBg = THEME_COLORS[story.theme] ?? Colors.cardBackground;
   const isCommunity = story.story_type === 'community';
+  const hasCover = !!story.cover_image && !imgError;
 
   return (
     <TouchableOpacity
@@ -40,8 +42,17 @@ export default function StoryCard({ story, isCompleted, onPress }: StoryCardProp
         </View>
       )}
 
+      {hasCover && (
+        <Image
+          source={{ uri: story.cover_image! }}
+          style={styles.coverImage}
+          resizeMode="cover"
+          onError={() => setImgError(true)}
+        />
+      )}
+
       <View style={styles.topRow}>
-        <Text style={styles.emoji}>{story.theme_emoji}</Text>
+        {!hasCover && <Text style={styles.emoji}>{story.theme_emoji}</Text>}
         <Text style={styles.title} numberOfLines={2}>
           {story.title}
         </Text>
@@ -88,6 +99,13 @@ export default function StoryCard({ story, isCompleted, onPress }: StoryCardProp
 }
 
 const styles = StyleSheet.create({
+  coverImage: {
+    width: '100%',
+    height: 160,
+    borderRadius: 14,
+    marginBottom: 12,
+    backgroundColor: Colors.border,
+  },
   card: {
     borderRadius: 20,
     padding: 18,

@@ -49,6 +49,9 @@ export class Story {
   @Column({ name: 'vote_count', type: 'integer', default: 0 })
   voteCount!: number;
 
+  @Column({ name: 'cover_image', type: 'text', nullable: true })
+  coverImage!: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

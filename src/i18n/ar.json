@@ -129,5 +129,14 @@
   "achievement.bilingual.title": "قارئ ثنائي اللغة",
   "achievement.bilingual.description": "اقرأ بلغتين",
   "achievement.polyglot.title": "متعدد اللغات",
-  "achievement.polyglot.description": "اقرأ بـ 3 لغات"
+  "achievement.polyglot.description": "اقرأ بـ 3 لغات",
+  "onboarding.slide1Title": "قصص للقراء الصغار",
+  "onboarding.slide1Desc": "اكتشف قصصاً سحرية مع رسومات ملونة وصوت واختبارات ممتعة!",
+  "onboarding.slide2Title": "اقرأ بـ 3 لغات",
+  "onboarding.slide2Desc": "كل قصة متوفرة بالإنجليزية والفرنسية والعربية. بدّل اللغة في أي وقت!",
+  "onboarding.slide3Title": "اجمع النجوم والشارات",
+  "onboarding.slide3Desc": "أجب على الاختبارات بعد كل قصة، اجمع النجوم واحصل على إنجازات!",
+  "onboarding.skip": "تخطي",
+  "onboarding.next": "التالي",
+  "onboarding.getStarted": "هيا نبدأ القراءة!"
 }

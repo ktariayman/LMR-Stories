@@ -8,7 +8,9 @@ import { StoryTranslation } from '../entities/StoryTranslation';
 import { QuizQuestion } from '../entities/QuizQuestion';
 import { Achievement } from '../entities/Achievement';
 import { fetchFairytales, SeedStory } from './fetchFairytales';
+import { additionalStories } from './moreStories';
 import { translateStory } from '../services/ai';
+import { generateCoverUrl } from '../services/illustration';
 
 // ─── Static fallback stories (EN + FR + AR) ───────────────────────────────────
 const fallbackStories: SeedStory[] = [
@@ -244,6 +246,14 @@ async function seedStory(story: SeedStory) {
   if (existing) return; // Idempotent — skip if exists
 
 
+  const enTitle = story.translations.find((t) => t.language === 'en')?.title || story.slug;
+  const coverImage = generateCoverUrl({
+    title: enTitle,
+    theme: story.theme,
+    themeEmoji: story.themeEmoji,
+    ageGroup: story.ageGroup,
+  });
+
   const saved = await storyRepo.save(storyRepo.create({
     slug: story.slug,
     difficulty: story.difficulty,
@@ -253,6 +263,7 @@ async function seedStory(story: SeedStory) {
     storyType: 'official',
     isPublic: true,
     isAiGenerated: false,
+    coverImage,
   }));
 
   for (const t of story.translations) {
@@ -366,6 +377,8 @@ async function main() {
     // Also add fallback stories (they have full EN/FR/AR)
     stories = [...stories, ...fallbackStories];
   }
+  // Always append additional stories
+  stories = [...stories, ...additionalStories];
 
   console.log(`\nSeeding ${stories.length} stories...`);
   let seeded = 0;

@@ -129,5 +129,14 @@
   "achievement.bilingual.title": "Bilingual Reader",
   "achievement.bilingual.description": "Read in 2 languages",
   "achievement.polyglot.title": "Polyglot",
-  "achievement.polyglot.description": "Read in 3 languages"
+  "achievement.polyglot.description": "Read in 3 languages",
+  "onboarding.slide1Title": "Stories for Young Readers",
+  "onboarding.slide1Desc": "Discover magical stories with colorful illustrations, read-aloud audio, and fun quizzes!",
+  "onboarding.slide2Title": "Read in 3 Languages",
+  "onboarding.slide2Desc": "Every story is available in English, French, and Arabic. Switch languages anytime!",
+  "onboarding.slide3Title": "Earn Stars & Badges",
+  "onboarding.slide3Desc": "Take quizzes after each story, collect stars, and unlock achievements as you read!",
+  "onboarding.skip": "Skip",
+  "onboarding.next": "Next",
+  "onboarding.getStarted": "Let's Start Reading!"
 }

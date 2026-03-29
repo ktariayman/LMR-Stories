@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -82,6 +83,14 @@ export default function StoryScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
+        {story.cover_image ? (
+          <Image
+            source={{ uri: story.cover_image }}
+            style={styles.coverImage}
+            resizeMode="cover"
+          />
+        ) : null}
+
         <AudioPlayer text={story.content} language={story.language} />
 
         <Text style={[styles.storyText, rtlStyle]}>{story.content}</Text>
@@ -111,6 +120,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  coverImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 16,
+    marginBottom: 16,
+    backgroundColor: Colors.border,
   },
   errorText: {
     fontSize: 18,

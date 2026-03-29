@@ -27,6 +27,7 @@ export interface Story {
   summary: string;
   quiz: QuizQuestion[];
   is_ai_generated?: boolean;
+  cover_image?: string | null;
   audio_content?: string | null;
   story_type?: StoryType;
   author_id?: string | null;
@@ -50,6 +51,7 @@ export interface StoryListItem {
   is_public?: boolean;
   vote_count?: number;
   user_has_voted?: boolean;
+  cover_image?: string | null;
   title: string;
   summary: string;
   language: Language;
@@ -69,6 +71,7 @@ export interface StoryDetail {
   author_username?: string | null;
   is_public?: boolean;
   vote_count?: number;
+  cover_image?: string | null;
   title: string;
   content: string;
   summary: string;

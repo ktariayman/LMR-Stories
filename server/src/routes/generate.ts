@@ -5,6 +5,7 @@ import { Story } from '../entities/Story';
 import { StoryTranslation } from '../entities/StoryTranslation';
 import { QuizQuestion } from '../entities/QuizQuestion';
 import { generateStory, translateStory } from '../services/ai';
+import { generateCoverUrl } from '../services/illustration';
 import { synthesizeSpeech } from '../services/tts';
 import { cacheDel } from '../config/redis';
 import { requireAuth } from '../middleware/auth';
@@ -26,6 +27,14 @@ router.post('/story', requireAuth, validate(generateStorySchema), async (req, re
 
     const authorId = req.user!.userId;
 
+    // Generate cover illustration URL
+    const coverImage = generateCoverUrl({
+      title: generated.title,
+      theme,
+      themeEmoji: generated.theme_emoji || '✨',
+      ageGroup: age_group,
+    });
+
     // Save to database
     const storyRepo = AppDataSource.getRepository(Story);
     const story = storyRepo.create({
@@ -38,6 +47,7 @@ router.post('/story', requireAuth, validate(generateStorySchema), async (req, re
       storyType: 'community',
       authorId,
       isPublic: Boolean(is_public),
+      coverImage,
     });
     const savedStory = await storyRepo.save(story);
 
@@ -85,6 +95,7 @@ router.post('/story', requireAuth, validate(generateStorySchema), async (req, re
         title: generated.title,
         content: generated.content,
         summary: generated.summary,
+        cover_image: coverImage,
         quiz: generated.quiz,
       },
     });

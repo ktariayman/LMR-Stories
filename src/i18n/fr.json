@@ -129,5 +129,14 @@
   "achievement.bilingual.title": "Lecteur bilingue",
   "achievement.bilingual.description": "Lis dans 2 langues",
   "achievement.polyglot.title": "Polyglotte",
-  "achievement.polyglot.description": "Lis dans 3 langues"
+  "achievement.polyglot.description": "Lis dans 3 langues",
+  "onboarding.slide1Title": "Des histoires pour jeunes lecteurs",
+  "onboarding.slide1Desc": "Découvre des histoires magiques avec des illustrations colorées, de l'audio et des quiz amusants !",
+  "onboarding.slide2Title": "Lis en 3 langues",
+  "onboarding.slide2Desc": "Chaque histoire est disponible en anglais, français et arabe. Change de langue quand tu veux !",
+  "onboarding.slide3Title": "Gagne des étoiles et des badges",
+  "onboarding.slide3Desc": "Réponds aux quiz après chaque histoire, collectionne des étoiles et débloque des succès !",
+  "onboarding.skip": "Passer",
+  "onboarding.next": "Suivant",
+  "onboarding.getStarted": "Commençons à lire !"
 }
