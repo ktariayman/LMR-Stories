@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { logger } from '../config/logger';
 import { AppDataSource } from '../config/data-source';
 import { Story } from '../entities/Story';
 import { StoryTranslation } from '../entities/StoryTranslation';
@@ -56,7 +57,7 @@ router.post('/story', requireAuth, validate(generateStorySchema), async (req, re
       });
       trans.audioContent = audioBase64;
     } catch (audioErr) {
-      console.error('Audio generation failed:', audioErr);
+      logger.error({ err: audioErr }, 'Audio generation failed');
     }
 
     await AppDataSource.getRepository(StoryTranslation).save(trans);
@@ -121,9 +122,9 @@ router.post('/story', requireAuth, validate(generateStorySchema), async (req, re
               correctAnswer: translated.quiz[i].correct_answer, sortOrder: i,
             }));
           }
-          console.log(`Auto-translated story ${storyId} → ${targetLang}`);
+          logger.info({ storyId, targetLang }, 'Auto-translated story');
         } catch (err) {
-          console.error(`Failed to auto-translate to ${targetLang}:`, err);
+          logger.error({ err, storyId, targetLang }, 'Failed to auto-translate');
         }
       }
       await cacheDel('stories:*');

@@ -6,6 +6,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { logger } from './config/logger';
 import { AppDataSource } from './config/data-source';
 import { connectRedis } from './config/redis';
 import { serverConfig } from './config/appConfig';
@@ -30,7 +31,7 @@ const allowedOrigins = process.env.CORS_ORIGINS
   : undefined;
 
 if (isProduction && !allowedOrigins) {
-  console.warn('WARNING: CORS_ORIGINS is not set in production. All cross-origin requests will be blocked.');
+  logger.warn('CORS_ORIGINS is not set in production. All cross-origin requests will be blocked.');
 }
 
 app.use(cors({
@@ -91,7 +92,7 @@ app.get('/api/health', (_req, res) => {
 
 // Error handler — hide internal details in production
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Server error:', err.message);
+  logger.error({ err }, 'Unhandled server error');
   res.status(500).json({
     error: isProduction ? 'Internal server error' : err.message,
   });
@@ -100,16 +101,16 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 async function bootstrap() {
   try {
     await AppDataSource.initialize();
-    console.log('Database connected');
+    logger.info('Database connected');
   } catch (err) {
-    console.error('Database connection failed:', err);
+    logger.fatal({ err }, 'Database connection failed');
     process.exit(1);
   }
 
   await connectRedis();
 
   app.listen(PORT, () => {
-    console.log(`LMR Stories API running on http://localhost:${PORT}`);
+    logger.info({ port: PORT }, 'LMR Stories API running');
   });
 }
 

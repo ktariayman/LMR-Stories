@@ -7,6 +7,7 @@ import { View, ActivityIndicator } from 'react-native';
 import { useAuthStore } from '../src/store/useAuthStore';
 import { appConfig } from '../src/config/appConfig';
 import { Colors } from '../src/constants/colors';
+import { ErrorBoundary } from '../src/components/ErrorBoundary';
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, restoreSession } = useAuthStore();
@@ -42,15 +43,17 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <StatusBar style="auto" />
-        <AuthGuard>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack>
-        </AuthGuard>
-      </SafeAreaProvider>
+      <ErrorBoundary>
+        <SafeAreaProvider>
+          <StatusBar style="auto" />
+          <AuthGuard>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
+          </AuthGuard>
+        </SafeAreaProvider>
+      </ErrorBoundary>
     </GestureHandlerRootView>
   );
 }

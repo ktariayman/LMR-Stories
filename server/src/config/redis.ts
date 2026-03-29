@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+import { logger } from './logger';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
@@ -12,18 +13,18 @@ export const redis = new Redis(REDIS_URL, {
 });
 
 redis.on('error', (err) => {
-  console.warn('Redis connection error (cache disabled):', err.message);
+  logger.warn({ err: err.message }, 'Redis connection error (cache disabled)');
 });
 
 redis.on('connect', () => {
-  console.log('Redis connected');
+  logger.info('Redis connected');
 });
 
 export async function connectRedis() {
   try {
     await redis.connect();
   } catch {
-    console.warn('Redis unavailable — running without cache');
+    logger.warn('Redis unavailable — running without cache');
   }
 }
 
